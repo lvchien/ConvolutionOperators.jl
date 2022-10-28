@@ -43,3 +43,15 @@ function convolve!(y, Z::LeftRightMulCVO, x, X, j, k_start=1, k_stop=size(Z,3))
     convolve!(w, CVO, Bx, BX, j, k_start, k_stop)
     y .+= A*w
 end
+
+
+function timeslice!(Y, Z::LeftRightMulCVO, k)
+
+    C = similar(Y, axes(Z)[1:2])
+    timeslice!(C, Z.convop, k)
+
+    A = Z.left_linear_map
+    B = Z.right_linear_map
+
+    Y .= A*C*B
+end

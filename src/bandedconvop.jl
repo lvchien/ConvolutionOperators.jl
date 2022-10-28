@@ -6,17 +6,21 @@ struct ConvOp{T} <: AbstractConvOp
     length::Int
 end
 
-
-function Base.axes(x::ConvOp) map(Base.OneTo, size(x)) end
-function Base.axes(x::ConvOp, i) axes(x)[i] end
-
-function Base.size(obj::ConvOp)
-    return (size(obj.data)[2:3]...,obj.length)
+function Base.eltype(x::ConvOp)
+    return eltype(x.data)
 end
 
-function Base.size(obj::ConvOp, i)
-    szs = size(obj)
-    return szs[i]
+function Base.size(obj::ConvOp) return (size(obj.data)[2:3]...,obj.length) end
+function _getindex(obj::ConvOp, m::Int, n::Int, k::Int)
+    if k < obj.k0[m,n]
+        return zero(eltype(obj.data))
+    end
+
+    if k > obj.k1[m,n]
+        return obj.tail[m,n]
+    end
+
+    return obj.data[k-obj.k0[m,n]+1,m,n]
 end
 
 function convolve!(y, Z::ConvOp, x, X, j, k_start=1, k_stop=size(Z,3))
@@ -37,18 +41,14 @@ function convolve!(y, Z::ConvOp, x, X, j, k_start=1, k_stop=size(Z,3))
     return y
 end
 
-function Base.getindex(obj::ConvOp, m::Int, n::Int, k::Int)
-    if k < obj.k0[m,n]
-        return zero(eltype(obj.data))
-    end
-
-    if k > obj.k1[m,n]
-        return obj.tail[m,n]
-    end
-
-    return obj.data[k-obj.k0[m,n]+1,m,n]
+function timeslice!(Y, Z::ConvOp, k)
+    @assert size(Y) == size(Z)[1:2]
+    for m in axes(Z,1)
+        for n in axes(Z,2)
+            Y[m,n] += _getindex(Z, m,n,k)
+    end end
+    return Y 
 end
-
 
 function polyeig(Z::ConvOp)
     kmax = maximum(Z.k1)
@@ -66,33 +66,25 @@ function polyeig(Z::ConvOp)
     # return Q
 end
 
+struct ConvOpAsArray{T} <: AbstractArray{T,3}
+    convop::ConvOp{T}
+end
 
-# function Base.:+(a::ConvOp, b::ConvOp)
+function Base.size(x::ConvOpAsArray) size(x.convop) end
+function Base.getindex(x::ConvOpAsArray, I::Vararg{Int,3}) _getindex(x.convop,I...) end
 
-#     @assert size(a.data) == size(b.data)
-#     M,N = size(a.data)
-#     T = promote_type(eltype(a.data), eltype(b.data))
 
-#     k0 = min.(a.k0, b.k0)
-#     k1 = max.(a.k1, b.k1)
+struct ConvOpAsMatrix{T} <: AbstractMatrix{Vector{T}}
+    convop::ConvOp{T}
+end
 
-#     bandwidth = maximum(k1 - k0) + 1
-#     data = zeros(T, bandwidth, M, N)
+function Base.size(x::ConvOpAsMatrix) size(x.convop)[1:2] end
+function Base.getindex(x::ConvOpAsMatrix, I::Vararg{Int,2})
+    [_getindex(x.convop,I...,k) for k in axes(x.convop,3)]
+end
 
-#     k1max = maximum(k1)
-#     tail = zeros(T,M,N)
-#     for m in 1:M, n in 1:N
-#         tail[m,n] = a[m,n,k1max+1] + b[m,n,k1max+1]
-#     end
+function Base.AbstractArray(x::ConvOp{T}) where {T} ConvOpAsArray(x) end
 
-#     for m in 1:M
-#         for n in 1:N
-#             for k in k0[m,n]:k1[m,n]
-#                 data[k,m,n] = a[m,n,k] + b[m,n,k]
-#             end
-#         end
-#     end
-
-#     lgt = max(a.length, b.length)
-#     return ConvOp(data, tail, k0, k1, lgt)
-# end
+function convolve!(y, Z::ConvOpAsMatrix, x, X, j, k_start=1, k_stop=size(Z,3))
+    convolve!(y, Z.convop, x, X, j, k_start, k_stop)
+end

@@ -6,6 +6,10 @@ struct LiftedConvOp <: AbstractConvOp
     colblock
 end
 
+function Base.eltype(x::LiftedConvOp)
+    return eltype(x.convop)
+end
+
 function Base.axes(x::LiftedConvOp)
     (x.rowaxis, x.colaxis, axes(x.convop,3))
 end
@@ -32,4 +36,16 @@ function convolve!(y, L::LiftedConvOp, x, X, j, k_start=1, k_stop=size(L,3))
     LIJ = L.convop
 
     convolve!(yI, LIJ, xJ, XJ, j, k_start, k_stop)
+end
+
+function timeslice!(Y, L::LiftedConvOp, k)
+
+    I = L.rowblock
+    J = L.colblock
+    LIJ = L.convop
+
+    ax1, ax2, _ = axes(L)
+
+    timeslice!(view(Y,ax1[I],ax2[J]),LIJ,k)
+    return Y
 end

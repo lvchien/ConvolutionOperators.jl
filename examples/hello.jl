@@ -32,24 +32,33 @@ cv = ConvolutionOperators.ConvOp(data, k0, k1, tail, ln)
 import Base: OneTo
 @test axes(cv) == (OneTo(2), OneTo(2), OneTo(ln))
 
-Z1 = [cv[m,n,1] for m in 1:size(cv)[1], n in 1:size(cv)[2]]
-Z2 = [cv[m,n,2] for m in 1:size(cv)[1], n in 1:size(cv)[2]]
-Z3 = [cv[m,n,3] for m in 1:size(cv)[1], n in 1:size(cv)[2]]
-Z4 = [cv[m,n,4] for m in 1:size(cv)[1], n in 1:size(cv)[2]]
-Z5 = [cv[m,n,5] for m in 1:size(cv)[1], n in 1:size(cv)[2]]
+Z = map(k -> zeros(T,2,2), axes(cv,3))
+for k in axes(cv,3)
+    ConvolutionOperators.timeslice!(Z[k], cv, k)
+end
 
-@test Z1 == [111 0; 0 122]
-@test Z2 == [1011 212; 0 222]
-@test Z3 == [1011 312; 321 1022]
-@test Z4 == [1011 1012; 1021 1022]
-@test Z5 == Z4
+@test Z[1] == [111 0; 0 122]
+@test Z[2] == [1011 212; 0 222]
+@test Z[3] == [1011 312; 321 1022]
+@test Z[4] == [1011 1012; 1021 1022]
+@test Z[5] == Z[4]
 
 lc = cv + 3*cv
+for k in axes(lc,3)
+    Q = zeros(T, axes(lc)[1:2])
+    ConvolutionOperators.timeslice!(Q, lc, k)
+    @test Q ≈ 4*Z[k]
+end
 
 A = rand(2,2)
 B = rand(2,2)
 
 lrc = A * cv * B
+for k in axes(lc,3)
+    Q = zeros(T, axes(lc)[1:2])
+    ConvolutionOperators.timeslice!(Q, lrc, k)
+    @test Q ≈ A*Z[k]*B
+end
 
 std = rand(2,7)
 STD = cumsum(std, dims=2)
@@ -62,6 +71,8 @@ ConvolutionOperators.convolve!(y1, lrc, std, STD, 3)
 A*ConvolutionOperators.convolve!(y2, cv, B*std, B*STD, 3)
 ConvolutionOperators.convolve!(y3, lc, std, STD, 3)
 4*ConvolutionOperators.convolve!(y4, cv, std, STD, 3)
+
+
 
 rowaxis = Base.OneTo(3)
 colaxis = Base.OneTo(4)
@@ -76,3 +87,13 @@ STD2 = cumsum(std2, dims=2)
 y5 = zeros(3)
 
 ConvolutionOperators.convolve!(y5, lifted, std2, STD2, 3)
+
+W = [zeros(T,size(lifted,1), size(lifted,2)) for k in axes(lifted,3)]
+for k in axes(lifted,3)
+    ConvolutionOperators.timeslice!(W[k], lifted, k)
+end
+
+Z = [Z1,Z2,Z3,Z4,Z5]
+for k in axes(W,3)
+    @assert W[k][rowblock,colblock] ≈ Z[k]
+end

@@ -11,17 +11,16 @@ end
 @testitem "matrices" begin
     include("setup.jl")
 
-    Z1 = [cv[m,n,1] for m in 1:size(cv)[1], n in 1:size(cv)[2]]
-    Z2 = [cv[m,n,2] for m in 1:size(cv)[1], n in 1:size(cv)[2]]
-    Z3 = [cv[m,n,3] for m in 1:size(cv)[1], n in 1:size(cv)[2]]
-    Z4 = [cv[m,n,4] for m in 1:size(cv)[1], n in 1:size(cv)[2]]
-    Z5 = [cv[m,n,5] for m in 1:size(cv)[1], n in 1:size(cv)[2]]
+    Z = map(k -> zeros(T,2,2), axes(cv,3))
+    for k in axes(cv,3)
+        ConvolutionOperators.timeslice!(Z[k], cv, k)
+    end
     
-    @test Z1 == [111 0; 0 122]
-    @test Z2 == [1011 212; 0 222]
-    @test Z3 == [1011 312; 321 1022]
-    @test Z4 == [1011 1012; 1021 1022]
-    @test Z5 == Z4
+    @test Z[1] == [111 0; 0 122]
+    @test Z[2] == [1011 212; 0 222]
+    @test Z[3] == [1011 312; 321 1022]
+    @test Z[4] == [1011 1012; 1021 1022]
+    @test Z[5] == Z[4]
 end
 
 @testitem "linearcombinations" begin
