@@ -1,7 +1,7 @@
 name = "ConvolutionOperators"
 uuid = "15927181-a1bb-497c-b745-8dbf505c019d"
 authors = ["Kristof Cools <krcools@gmail.com> and contributors"]
-version = "0.1.0"
+version = "0.2.0"
 
 [deps]
 LinearAlgebra = "37e2e46d-f89d-539d-b4ee-838fcccc9c8e"
