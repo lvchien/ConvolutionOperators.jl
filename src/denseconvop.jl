@@ -11,7 +11,7 @@ function convolve!(y, Z::DenseConvOp, x, X, j, k_start=1, k_stop=size(Z,3))
     # @show k_stop
     for k in k_start : min(j,k_stop,K)
         i = j - k + 1
-        y .+= Z[:,:,k] * x[:,i]
+        y .+= Z.data[:,:,k] * x[:,i]
     end
     return y
 end
