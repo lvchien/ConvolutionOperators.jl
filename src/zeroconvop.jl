@@ -19,3 +19,11 @@ end
 function timeslice!(Y, Z::ZeroConvOp, k)
     fill!(Y, false)
 end
+
+function tailindex(Z::ZeroConvOp)
+    return 0
+end
+
+function hastail(Z::ZeroConvOp)
+    return false
+end

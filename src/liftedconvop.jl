@@ -49,3 +49,11 @@ function timeslice!(Y, L::LiftedConvOp, k)
     timeslice!(view(Y,ax1[I],ax2[J]),LIJ,k)
     return Y
 end
+
+function tailindex(Z::LiftedConvOp)
+    return tailindex(Z.convop)
+end
+
+function hastail(Z::LiftedConvOp)
+    return hastail(Z.convop)
+end

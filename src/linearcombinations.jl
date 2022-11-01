@@ -90,3 +90,21 @@ function timeslice!(Y, Z::AbstractConvOp_LC, k)
     end
     return Y
 end
+
+
+function tailindex(Z::AbstractConvOp_LC)
+    ti = 0
+    for (a,t) in terms(Z)
+        ti = max(ti, tailindex(t))
+    end
+    return ti
+end
+
+
+function hastail(Z::AbstractConvOp_LC)
+    ht = false
+    for (a,t) in terms(Z)
+        ht = ht || hastail(t)
+    end
+    return ht
+end
