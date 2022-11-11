@@ -53,5 +53,5 @@ function timeslice!(Y, Z::LeftRightMulCVO, k)
     A = Z.left_linear_map
     B = Z.right_linear_map
 
-    Y .= A*C*B
+    Y .= Matrix(A*C*B)
 end
