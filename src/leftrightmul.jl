@@ -1,4 +1,4 @@
-using LinearAlgebra
+using LinearAlgebra, LinearMaps
 
 struct LeftRightMulCVO <: AbstractConvOp
     convop
@@ -26,8 +26,8 @@ function Base.axes(x::LeftRightMulCVO, i) axes(x)[i] end
 function Base.:*(C::AbstractConvOp, B::LinearMap) LeftRightMulCVO(C,I,B) end
 function Base.:*(A::LinearMap, C::AbstractConvOp) LeftRightMulCVO(C,A,I) end
 
-function Base.:*(C::AbstractConvOp, B::AbstractArray) C * LinearMap(B) end
-function Base.:*(A::AbstractArray, C::AbstractConvOp) LinearMap(B) * C end
+function Base.:*(C::AbstractConvOp, B::AbstractArray) LeftRightMulCVO(C,I,B) end
+function Base.:*(A::AbstractArray, C::AbstractConvOp) LeftRightMulCVO(C,A,I) end
 
 function convolve!(y, Z::LeftRightMulCVO, x, X, j, k_start=1, k_stop=size(Z,3))
 
