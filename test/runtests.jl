@@ -83,4 +83,24 @@ end
     @test y1 ≈ y2[rowblock]
 end
 
+@testitem "truncatedconvop" begin
+    include("setup.jl")
+    @test size(cv) == (2,2,5)
+    @test ConvolutionOperators.hastail(cv) == true
+    tcv = ConvolutionOperators.truncate(cv,4)
+    @test size(tcv) == (2,2,5)
+    @test ConvolutionOperators.hastail(tcv) == false
+
+    std = rand(2,12)
+    STD = cumsum(std, dims=2)
+
+    y1 = zeros(2)
+    y2 = zeros(2)
+
+    ConvolutionOperators.convolve!(y1, cv, std, STD, 12, 1, 3)
+    ConvolutionOperators.convolve!(y2, tcv, std, STD, 12, 1, 12)
+    @test y1 ≈ y2
+end
+
+
 @run_package_tests

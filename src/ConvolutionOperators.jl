@@ -18,6 +18,7 @@ include("bandedconvop.jl")
 include("linearcombinations.jl")
 include("leftrightmul.jl")
 include("liftedconvop.jl")
+include("truncatedconvop.jl")
 
 
 end

@@ -73,10 +73,17 @@ function convolve!(y, Z::ConvOpAsMatrix, x, X, j, k_start=1, k_stop=size(Z,3))
     convolve!(y, Z.convop, x, X, j, k_start, k_stop)
 end
 
-function tailindex(Z)
+function tailindex(Z::ConvOp)
     return maximum(Z.k1)
 end
 
-function hastail(Z)
+"""
+    hastail(x::AbstractConvop) -> Bool
+
+Returns yes if the timeslices for k larger then `tailindex(x)` take on
+    a constant value. This can be exploited to compute convolutions more
+    efficiency.
+"""
+function hastail(Z::ConvOp)
     return Z.length > tailindex(Z)
 end
