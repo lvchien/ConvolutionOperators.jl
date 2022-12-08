@@ -18,7 +18,7 @@ function Base.size(x::TruncatedConvOp)
 end
 
 function convolve!(y, Z::TruncatedConvOp, x, X, j, k_start=1, k_stop=size(Z,3))
-    k_stop = min(k_stop, size(Z,3))
+    k_stop = min(k_stop, Z.kmax)
     convolve!(y, Z.convop, x, X, j, k_start, k_stop)
 end
 

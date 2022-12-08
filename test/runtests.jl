@@ -21,6 +21,31 @@ end
     @test Z[3] == [1011 312; 321 1022]
     @test Z[4] == [1011 1012; 1021 1022]
     @test Z[5] == Z[4]
+
+    std = rand(2,7)
+    STD = cumsum(std, dims=2)
+
+    ln = 12
+    cv = ConvolutionOperators.ConvOp(data, k0, k1, tail, ln)
+    Z = map(k -> zeros(T,2,2), 1:12)
+    for k in axes(cv,3)
+        ConvolutionOperators.timeslice!(Z[k], cv, k)
+    end
+
+    for j in 1:7
+        for kstart in 1:ln
+            for kstop in kstart:ln
+                y1 = zeros(2);
+                ConvolutionOperators.convolve!(y1, cv, std, STD, j, kstart, kstop)
+                y2 = zeros(2);
+                for k in kstart:kstop
+                    j - k + 1 > 0 || continue
+                    y2 += Z[k]*std[:,j-k+1]
+                end
+                @test y1 ≈ y2
+            end
+        end
+    end
 end
 
 @testitem "linearcombinations" begin
@@ -94,12 +119,22 @@ end
     std = rand(2,12)
     STD = cumsum(std, dims=2)
 
-    y1 = zeros(2)
-    y2 = zeros(2)
+    y1 = zeros(2); ConvolutionOperators.convolve!(y1, cv, std, STD, 12, 1, 4)
+    y2 = zeros(2); ConvolutionOperators.convolve!(y2, cv, std, STD, 12, 1, 8)
+    @show y1 ≈ y2
 
-    ConvolutionOperators.convolve!(y1, cv, std, STD, 12, 1, 3)
-    ConvolutionOperators.convolve!(y2, tcv, std, STD, 12, 1, 12)
-    @test y1 ≈ y2
+    y1 = zeros(2); ConvolutionOperators.convolve!(y1, cv, std, STD, 12, 2, 4)
+    y2 = zeros(2); ConvolutionOperators.convolve!(y2, cv, std, STD, 12, 2, 8)
+    @show y1 ≈ y2
+
+    y1 = zeros(2); ConvolutionOperators.convolve!(y1, cv, std, STD, 12, 3, 4)
+    y2 = zeros(2); ConvolutionOperators.convolve!(y2, cv, std, STD, 12, 3, 8)
+    @show y1 ≈ y2
+
+    y1 = zeros(2); ConvolutionOperators.convolve!(y1, cv, std, STD, 12, 4, 4)
+    y2 = zeros(2); ConvolutionOperators.convolve!(y2, cv, std, STD, 12, 4, 8)
+    @show y1 ≈ y2
+
 end
 
 
