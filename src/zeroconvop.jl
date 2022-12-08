@@ -12,7 +12,7 @@ function Base.axes(x::ZeroConvOp)
 end
 
 function _getindex(x::ZeroConvOp, i, j, k) false end
-function convolve!(y, Z::ZeroConvOp, x, X, j, k_start=1, k_stop=size(Z,3), tail_truncate=false)
+function convolve!(y, Z::ZeroConvOp, x, X, j, k_start=1, k_stop=size(Z,3))
     fill!(y, false)
 end
 

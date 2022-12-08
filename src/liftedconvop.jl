@@ -21,7 +21,7 @@ function Base.size(x::LiftedConvOp,i)
     return szs[i]
 end
 
-function convolve!(y, L::LiftedConvOp, x, X, j, k_start=1, k_stop=size(L,3), tail_truncate=false)
+function convolve!(y, L::LiftedConvOp, x, X, j, k_start=1, k_stop=size(L,3))
 
     y = view(y, axes(L,1))
     x = view(x, axes(L,2), axes(x,2))
@@ -35,7 +35,7 @@ function convolve!(y, L::LiftedConvOp, x, X, j, k_start=1, k_stop=size(L,3), tai
     XJ = view(X, J, axes(x,2))
     LIJ = L.convop
 
-    convolve!(yI, LIJ, xJ, XJ, j, k_start, k_stop, tail_truncate)
+    convolve!(yI, LIJ, xJ, XJ, j, k_start, k_stop)
 end
 
 function timeslice!(Y, L::LiftedConvOp, k)
