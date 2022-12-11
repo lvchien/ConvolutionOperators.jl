@@ -25,13 +25,6 @@ function companion(Z)
 end
 
 
-function timeslice(Z,k)
-    T = eltype(Z)
-    Zk = zeros(T, size(Z)[1:2])
-    ConvolutionOperators.timeslice!(Zk, Z, k)
-end
-
-
 function materializeconvop(Z)
     M = size(Z,1)
     T = eltype(Z)
