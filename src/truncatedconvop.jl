@@ -27,6 +27,8 @@ function timeslice!(Y, Z::TruncatedConvOp, k)
     timeslice!(Y, Z.convop, k)
 end
 
+tailindex(Z::TruncatedConvOp) = tailindex(Z.convop)
+
 function hastail(Z::TruncatedConvOp)
     false
 end
