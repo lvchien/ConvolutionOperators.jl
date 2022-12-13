@@ -51,6 +51,7 @@ end
 function timeslice!(Y, Z::LeftRightMulCVO, k)
 
     C = similar(Y, axes(Z)[1:2])
+    fill!(C, 0)
     timeslice!(C, Z.convop, k)
 
     A = Z.left_linear_map
