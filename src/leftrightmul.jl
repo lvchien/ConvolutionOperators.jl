@@ -32,6 +32,8 @@ function Base.:*(A::LinearMap, C::AbstractConvOp) LeftRightMulCVO(C,A,I) end
 function Base.:*(C::AbstractConvOp, B::AbstractArray) LeftRightMulCVO(C,I,B) end
 function Base.:*(A::AbstractArray, C::AbstractConvOp) LeftRightMulCVO(C,A,I) end
 
+function Base.eltype(x::LeftRightMulCVO) eltype(x.convop) end
+
 function convolve!(y, Z::LeftRightMulCVO, x, X, j, k_start=1, k_stop=size(Z,3))
 
     CVO = Z.convop
