@@ -4,6 +4,9 @@ end
 
 function Base.size(x::DenseConvOp) size(x.data) end
 function _getindex(x::DenseConvOp, i, j, k) getindex(x.data, i, j, k) end
+function Base.eltype(x::DenseConvOp)
+    return eltype(x.data)
+end
 
 function convolve!(y, Z::DenseConvOp, x, X, j, k_start=1, k_stop=size(Z,3))
 

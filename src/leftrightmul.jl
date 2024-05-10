@@ -19,6 +19,9 @@ function Base.size(x::LeftRightMulCVO)
 end
 
 function Base.size(x::LeftRightMulCVO,i) size(x)[i] end
+function Base.eltype(x::LeftRightMulCVO)
+    promote_type(eltype(x.left_linear_map), eltype(x.convop), eltype(x.right_linear_map))
+end
 
 function Base.axes(x::LeftRightMulCVO) map(Base.OneTo, size(x)) end
 function Base.axes(x::LeftRightMulCVO, i) axes(x)[i] end
