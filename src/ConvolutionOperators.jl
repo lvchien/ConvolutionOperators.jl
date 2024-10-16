@@ -25,6 +25,7 @@ include("linearcombinations.jl")
 include("leftrightmul.jl")
 include("liftedconvop.jl")
 include("truncatedconvop.jl")
+include("matrixconvop.jl")
 
 
 end
