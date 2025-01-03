@@ -15,28 +15,34 @@ end
 
 function Base.size(Z::MatrixConvOp)
     mat = Z.matconvop
-    blocksize = size(mat[1, 1])
-    sz3 = 0
+    M, N, K = 0, 0, 0
     for i in 1:size(mat, 1)
+        M += size(mat[i, 1], 1)
         for j in 1:size(mat, 2)
-            sz3 = max(sz3, size(mat[i, j], 3))
+            if i == 1 
+                N += size(mat[1, j], 2) 
+            end
+            K = max(K, size(mat[i, j], 3))
         end
     end
-    return (blocksize[1]*size(mat, 1), blocksize[2]*size(mat, 2), sz3)
+    return (M, N, K)
 end
 
 function convolve!(y, Z::MatrixConvOp, x, X, j, k_start=1, k_stop=size(Z,3))
     mat = Z.matconvop
-    blocksize = size(mat[1, 1])
-
+    M0 = 0
     for i1 in 1:size(mat, 1)
+        N0 = 0
         for i2 in 1:size(mat, 2)
-            xi2 = x[(i2-1)*blocksize[2]+1:i2*blocksize[2], :]
-            Xi2 = X[(i2-1)*blocksize[2]+1:i2*blocksize[2], :]
-            Y = zeros(size(xi2)[1])
+            M, N = size(mat[i1, i2])[1:2]
+            xi2 = x[N0+1:N0+N, :]
+            Xi2 = X[N0+1:N0+N, :]
+            Y = zeros(M)
             convolve!(Y, mat[i1, i2], xi2, Xi2, j, k_start, k_stop)
-            y[(i1-1)*blocksize[1]+1:i1*blocksize[1]] .+= Y
+            y[M0+1:M0+M] .+= Y
+            N0 += N
         end 
+        M0 += size(mat[i1, 1], 1)
     end
     return y
 end
@@ -44,12 +50,16 @@ end
 function timeslice!(Y, Z::MatrixConvOp, k)
     fill!(Y, 0)
     mat = Z.matconvop
-    slice = timeslice.(mat, k)
-    blocksize = size(mat[1, 1])
+    M0 = 0
     for i in 1:size(mat, 1)
+        N0 = 0
         for j in 1:size(mat, 2)
-            Y[(i-1)*blocksize[1]+1:i*blocksize[1], (j-1)*blocksize[2]+1:j*blocksize[2]] .= slice[i, j]
+            slice = timeslice(mat[i, j], k)
+            M, N = size(slice)
+            Y[M0+1:M0+M, N0+1:N0+N] .= slice
+            N0 += N
         end
+        M0 += size(mat[i, 1], 1)
     end
     return Y
 end
