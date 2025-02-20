@@ -12,9 +12,9 @@ function Base.eltype(x::TruncatedConvOp)
 end
 
 function Base.size(x::TruncatedConvOp)
-    size(x.convop)
-    # ln = minimum(size(x.convop)[3], x.kmax)
-    # return (size(x.convop)[1:2]..., ln)
+    # size(x.convop)
+    ln = min(size(x.convop)[3], x.kmax)
+    return (size(x.convop)[1:2]..., ln)
 end
 
 function convolve!(y, Z::TruncatedConvOp, x, X, j, k_start=1, k_stop=size(Z,3))
