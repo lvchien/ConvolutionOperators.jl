@@ -31,7 +31,7 @@ end
 ```
     Build the companion matrix for Z that has a tail. The `ranktail` specifies the dimension of the range of tail. SVD does not require the tail to be symmetric
 ```
-function companion_with_tail(Z; ranktail)
+function companion_with_tail(Z; ranktail=size(Z,1))
     M, N = size(Z)[1:2]
     T = eltype(Z)
     @assert M == N
