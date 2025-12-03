@@ -65,6 +65,10 @@ function timeslice!(Y, Z::LeftRightMulCVO, k)
     Y .= Matrix(A*C*B)
 end
 
+function tailindex(Z::LeftRightMulCVO)
+    tailindex(Z.convop)
+end
+
 
 function hastail(Z::LeftRightMulCVO)
     hastail(Z.convop)
