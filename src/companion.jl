@@ -8,7 +8,7 @@ function companion_no_tail(Z)
     T = eltype(Z)
     @assert M == N
 
-    K = size(Z,3) - 1
+    K = size(Z,3)
     @assert K > 1
 
     C = zeros(T, M*(K-1), N*(K-1))   
@@ -38,8 +38,8 @@ function companion_with_tail(Z; ranktail=size(Z,1))
     @assert ranktail <= M
     Mt = min(ranktail, M)
 
-    K = ConvolutionOperators.tailindex(Z) 
-    @assert K > 1
+    K = ConvolutionOperators.tailindex(Z) + 1
+    @assert K > 2
 
     C = zeros(T, M*(K-2)+Mt, N*(K-2)+Mt)
 
